@@ -112,7 +112,24 @@ export async function runAgent(
     });
     const content = response.choices[0]?.message.content ?? "";
 
-    throw new Error("Die branch-spezifische Loop-Implementierung fehlt.");
+    // TODO: ÜBUNG 1 - Parse und validiere den JSON-String mit
+    // parseAgentAction in ein AgentAction-Objekt.
+    // TODO: ÜBUNG 1 - Gib den Gedanken des Agenten aus, damit der Loop
+    // nachvollziehbar wird.
+    // TODO: ÜBUNG 1 - Beende den Loop sofort, wenn die Action "finish" ist.
+    // TODO: ÜBUNG 1 - Rufe je nach Action die passende Tool-Funktion auf:
+    // runShell, readFile oder writeFile.
+    // TODO: ÜBUNG 1 - Behandle unbekannte Actions als Fehlertext.
+    // TODO: ÜBUNG 1 - Gib das Tool-Ergebnis gekürzt auf der Konsole aus.
+    // TODO: ÜBUNG 1 - Füge die Assistant-Antwort und das Tool-Ergebnis wieder
+    // zur Message-History hinzu, damit der Agent im nächsten Schritt auf dem
+    // letzten Ergebnis weiterarbeiten kann.
+    // SO PRÜFST DU ES: Starte das Programm. Der Agent sollte mehrere Schritte
+    // ausführen, eine Datei im Ordner "HelloWorld" erzeugen, sie ausführen und
+    // am Ende "Hallo Welt aus TypeScript" ausgeben.
+    throw new Error(
+      "ÜBUNG 1: Implementiere JSON-Parsing, Tool-Routing und History-Update.",
+    );
   }
 }
 
