@@ -92,6 +92,72 @@ export const TASK = [
 ].join(" ");
 
 
+const SENSITIVE_HTTP_HEADERS = new Set([
+  "authorization",
+  "api-key",
+  "x-api-key",
+  "cookie",
+  "set-cookie",
+]);
+
+
+function sanitizedHeaders(headers: Headers): Record<string, string> {
+  return Object.fromEntries(
+    Array.from(headers.entries()).map(([name, value]) => [
+      name,
+      SENSITIVE_HTTP_HEADERS.has(name.toLowerCase())
+        ? "<redacted>"
+        : value,
+    ]),
+  );
+}
+
+
+function formatHttpBody(body: string): string {
+  if (!body) {
+    return "<empty>";
+  }
+
+  try {
+    return JSON.stringify(JSON.parse(body), null, 2);
+  } catch {
+    return body;
+  }
+}
+
+
+export function createLoggingFetch(
+  baseFetch: typeof fetch = globalThis.fetch,
+): typeof fetch {
+  const loggingFetch: typeof fetch = async (input, init) => {
+    const request = new Request(input, init);
+    const requestBody = await request.clone().text();
+
+    console.log("\n=== OpenAI Request ===");
+    console.log(`${request.method} ${request.url}`);
+    console.log("Headers:");
+    console.log(JSON.stringify(sanitizedHeaders(request.headers), null, 2));
+    console.log("Body:");
+    console.log(formatHttpBody(requestBody));
+
+    const response = await baseFetch(request);
+    const responseBody = await response.clone().text();
+
+    console.log("=== OpenAI Response ===");
+    console.log(`Status: ${response.status}`);
+    console.log("Headers:");
+    console.log(JSON.stringify(sanitizedHeaders(response.headers), null, 2));
+    console.log("Body:");
+    console.log(formatHttpBody(responseBody));
+    console.log("=======================\n");
+
+    return response;
+  };
+
+  return loggingFetch;
+}
+
+
 function requiredArgument(
   actionData: AgentAction,
   name: string,
@@ -106,7 +172,8 @@ function requiredArgument(
 
 export function createOpenAIClient(httpLogging = false): OpenAI {
   return new OpenAI({
-    logLevel: httpLogging ? "debug" : "warn",
+    fetch: httpLogging ? createLoggingFetch() : globalThis.fetch,
+    logLevel: "warn",
   });
 }
 

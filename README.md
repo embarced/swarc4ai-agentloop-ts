@@ -53,8 +53,8 @@ npm start
 
 ### Optionales HTTP-Logging
 
-Auf dem Branch `main` kann der Debug-Log des OpenAI-SDKs mit
-`--http-logging` aktiviert werden:
+Auf dem Branch `main` kann ein vollständiger HTTP-Log mit `--http-logging`
+aktiviert werden:
 
 ```bash
 npm start -- --http-logging
@@ -66,10 +66,21 @@ Für die kompilierte Anwendung:
 npm run start:compiled -- --http-logging
 ```
 
-Ohne den Parameter bleibt das HTTP-Logging deaktiviert. Das SDK maskiert
-Authentifizierungs-Header. Request- und Response-Bodies können jedoch Prompts,
-Tool-Ergebnisse und Modellantworten enthalten und sollten deshalb nicht in
-öffentliche Logs kopiert werden.
+Der Logger gibt die JSON-Bodies vollständig und eingerückt aus. Besonders
+interessant ist im Request das Feld `messages`: Dort sind der System Prompt,
+die Aufgabe, frühere Agent-Antworten und die bisherigen Tool-Ergebnisse zu
+sehen.
+
+Diese Übung verwendet bewusst nicht das native Tool-Calling der OpenAI API.
+Deshalb gibt es im Request kein `tools`-Feld. Stattdessen beschreibt der
+System Prompt die erlaubten Aktionen `run_shell`, `read_file`, `write_file`
+und `finish`. Das Modell antwortet mit einer JSON-Aktion, die anschließend
+vom TypeScript-Code ausgeführt wird.
+
+Ohne den Parameter bleibt das HTTP-Logging deaktiviert.
+Authentifizierungs-Header und Cookies werden maskiert. Request- und
+Response-Bodies können jedoch Prompts, Tool-Ergebnisse und Modellantworten
+enthalten und sollten deshalb nicht in öffentliche Logs kopiert werden.
 
 ## Arbeitsweise
 
