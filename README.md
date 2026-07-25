@@ -51,6 +51,26 @@ $env:OPENAI_API_KEY="<dein-key>"
 npm start
 ```
 
+### Optionales HTTP-Logging
+
+Auf dem Branch `main` kann der Debug-Log des OpenAI-SDKs mit
+`--http-logging` aktiviert werden:
+
+```bash
+npm start -- --http-logging
+```
+
+Für die kompilierte Anwendung:
+
+```bash
+npm run start:compiled -- --http-logging
+```
+
+Ohne den Parameter bleibt das HTTP-Logging deaktiviert. Das SDK maskiert
+Authentifizierungs-Header. Request- und Response-Bodies können jedoch Prompts,
+Tool-Ergebnisse und Modellantworten enthalten und sollten deshalb nicht in
+öffentliche Logs kopiert werden.
+
 ## Arbeitsweise
 
 Dieses Repository enthält:

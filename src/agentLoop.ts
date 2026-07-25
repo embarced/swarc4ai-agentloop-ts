@@ -104,6 +104,18 @@ function requiredArgument(
 }
 
 
+export function createOpenAIClient(httpLogging = false): OpenAI {
+  return new OpenAI({
+    logLevel: httpLogging ? "debug" : "warn",
+  });
+}
+
+
+export function isHttpLoggingEnabled(args: readonly string[]): boolean {
+  return args.includes("--http-logging");
+}
+
+
 export async function runAgent(
   client: OpenAI = new OpenAI(),
   maxSteps = 15,
@@ -172,8 +184,9 @@ export async function runAgent(
 }
 
 
-async function main(): Promise<void> {
-  await runAgent();
+async function main(args: readonly string[] = process.argv.slice(2)): Promise<void> {
+  const client = createOpenAIClient(isHttpLoggingEnabled(args));
+  await runAgent(client);
 }
 
 
