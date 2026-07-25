@@ -92,6 +92,18 @@ export const TASK = [
 ].join(" ");
 
 
+function requiredArgument(
+  actionData: AgentAction,
+  name: string,
+): string {
+  const value = actionData.args[name];
+  if (value === undefined) {
+    throw new Error(`Fehlendes Argument: ${name}`);
+  }
+  return value;
+}
+
+
 export async function runAgent(
   client: OpenAI = new OpenAI(),
   maxSteps = 15,
@@ -112,7 +124,50 @@ export async function runAgent(
     });
     const content = response.choices[0]?.message.content ?? "";
 
-    throw new Error("Die branch-spezifische Loop-Implementierung fehlt.");
+    try {
+      const actionData = parseAgentAction(content);
+
+      console.log(`\n[Gedanke]: ${actionData.thought}`);
+
+      if (actionData.action === "finish") {
+        console.log("Fertig!");
+        break;
+      }
+
+      let toolResult: string;
+      switch (actionData.action) {
+        case "run_shell":
+          toolResult = runShell(requiredArgument(actionData, "command"));
+          break;
+        case "read_file":
+          toolResult = readFile(requiredArgument(actionData, "path"));
+          break;
+        case "write_file":
+          toolResult = writeFile(
+            requiredArgument(actionData, "path"),
+            requiredArgument(actionData, "content"),
+          );
+          break;
+        default:
+          toolResult = `Fehler: Unbekanntes Tool ${actionData.action}`;
+      }
+
+      const displayResult = toolResult.length > 100
+        ? `${toolResult.slice(0, 100)}...`
+        : toolResult;
+      console.log(`   [Ergebnis]: ${displayResult}`);
+
+      messages.push({ role: "assistant", content });
+      messages.push({
+        role: "user",
+        content: `Tool Output: ${toolResult}`,
+      });
+    } catch (error) {
+      console.error(
+        `JSON Parsing Fehler oder Ausnahmefehler: ${errorMessage(error)}`,
+      );
+      console.error(`Raw Content: ${content}`);
+    }
   }
 }
 
