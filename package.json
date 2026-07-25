@@ -1,0 +1,25 @@
+{
+  "name": "agentic-loop-exercise",
+  "version": "0.1.0",
+  "description": "Coding exercise for implementing a simple agentic loop",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "tsx src/agentLoop.ts",
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start:compiled": "node dist/agentLoop.js"
+  },
+  "dependencies": {
+    "openai": "^6.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
